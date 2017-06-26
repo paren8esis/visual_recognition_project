@@ -169,10 +169,44 @@ def plot_embedding(X, imagepaths, collection_size, title=None):
             shown_images = np.r_[shown_images, [X[i]]]
             timg = cv2.imread(imagepaths[i])
             timg = timg[:, :, ::-1]  # BGR -> RGB
-            timg = cv2.resize(timg, dsize=(32, 32))
+            timg = cv2.resize(timg, dsize=(42, 42))
             imagebox = offsetbox.AnnotationBbox(offsetbox.OffsetImage(timg, cmap=plt.cm.gray_r), X[i], bboxprops=dict(edgecolor='red'))
             ax.add_artist(imagebox)
     plt.xticks([]), plt.yticks([])
     if title is not None:
         plt.title(title)
     plt.show(block=True)
+
+
+def get_labels_imagenet(imagenames):
+    '''
+    Extracts the label from the image names according to ImageNet convention.
+    '''
+    synset = {'n01503061': 'bird', 'n02084071': 'dog', 'n02121808': 'cat',
+              'n02691156': 'airplane', 'n02958343': 'car'}
+    return [synset[x.split('_')[0]] for x in imagenames]
+
+
+def plot_cluster_evaluation_scores(scores, score_names, clustering_methods):
+    '''
+    Plots the given evaluation scores in a grouped bar plot.
+    '''
+    n = len(scores)
+
+    margin = 0.05  # Space between groups of data
+    width = (1.-2.*margin)/n
+    ind = np.arange(n)  # the x locations of the groups
+
+    fig, ax = plt.subplots()
+
+    for i in range(n):
+        plt.bar(ind+margin+(i*width), scores[i], width)
+
+    ax.set_ylabel('Score')
+    ax.set_title('Cluster evaluation scores')
+    ax.set_xticks([i+(3.5 * width) for i in ind])
+    ax.set_xticklabels(clustering_methods)
+    plt.legend(score_names)
+    plt.grid()
+
+    plt.show()
