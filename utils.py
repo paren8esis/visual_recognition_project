@@ -191,11 +191,11 @@ def plot_cluster_evaluation_scores(scores, score_names, clustering_methods):
     '''
     Plots the given evaluation scores in a grouped bar plot.
     '''
-    n = len(scores)
+    n = len(score_names)
 
     margin = 0.05  # Space between groups of data
     width = (1.-2.*margin)/n
-    ind = np.arange(n)  # the x locations of the groups
+    ind = np.arange(len(clustering_methods))  # the x locations of the groups
 
     fig, ax = plt.subplots()
 
