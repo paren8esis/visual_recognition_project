@@ -139,7 +139,8 @@ def create_collection(selected_classes, data_folder, collection_folder,
                   os.path.join(collection_folder, imagenames[ind]))
 
 
-def plot_embedding(X, imagepaths, collection_size, title=None):
+def plot_embedding(X, imagepaths, collection_size, title=None,
+                   test_image=False, image_size=42):
     '''
     Plots the images in the embedding space. The test image has red border.
 
@@ -149,6 +150,13 @@ def plot_embedding(X, imagepaths, collection_size, title=None):
         A list containing all paths to the images.
     collection_size: int
         The number of images inside the collection.
+    test_image: bool, default False
+        If True, then we assume that the last vector in X corresponds to a
+        test image, so we annotate it with a red box and the others with a
+        black one. Otherwise, we annotate all images with a black box.
+    image_size: int, default 42
+        The final size of the thumbnails to be shown in the plot will be
+        (image_size, image_size).
 
     Kudos to georgeretsi for the code.
     '''
@@ -169,8 +177,11 @@ def plot_embedding(X, imagepaths, collection_size, title=None):
             shown_images = np.r_[shown_images, [X[i]]]
             timg = cv2.imread(imagepaths[i])
             timg = timg[:, :, ::-1]  # BGR -> RGB
-            timg = cv2.resize(timg, dsize=(42, 42))
-            imagebox = offsetbox.AnnotationBbox(offsetbox.OffsetImage(timg, cmap=plt.cm.gray_r), X[i], bboxprops=dict(edgecolor='red'))
+            timg = cv2.resize(timg, dsize=(image_size, image_size))
+            if (i == X.shape[0] - 1) and (test_image == True):
+                imagebox = offsetbox.AnnotationBbox(offsetbox.OffsetImage(timg, cmap=plt.cm.gray_r), X[i], bboxprops=dict(edgecolor='red'))
+            else:
+                imagebox = offsetbox.AnnotationBbox(offsetbox.OffsetImage(timg, cmap=plt.cm.gray_r), X[i], bboxprops=dict(edgecolor='black'))
             ax.add_artist(imagebox)
     plt.xticks([]), plt.yticks([])
     if title is not None:
@@ -185,6 +196,22 @@ def get_labels_imagenet(imagenames):
     synset = {'n01503061': 'bird', 'n02084071': 'dog', 'n02121808': 'cat',
               'n02691156': 'airplane', 'n02958343': 'car'}
     return [synset[x.split('_')[0]] for x in imagenames]
+
+
+def get_labels_random(imagenames):
+    '''
+    Extracts the labels from the given image names.
+    Naming should follow the format:
+        label1_label2_..._labelx number.file_format
+    where number is optional and is used only in case of multiple images with
+    the same labels.
+    '''
+    all_labels = []
+    for imagename in imagenames:
+        labels = imagename.split('.')[0].split(' ')[0].split('_')
+        all_labels.append(labels)
+
+    return all_labels
 
 
 def plot_cluster_evaluation_scores(scores, score_names, clustering_methods):
