@@ -274,7 +274,8 @@ class CustomClassifier:
 
         return test_images_paths
 
-    def classify(self, test_images_paths, plot_results=True, verbose=True):
+    def classify(self, test_images_paths, plot_results=True, verbose=True,
+                 save_name=None):
         '''
         Performs classification over the test images and, if needed, plots the
         results.
@@ -289,6 +290,9 @@ class CustomClassifier:
         verbose : bool, default True
             If True, then a message appears every time a new image is being
             classified.
+        save_name : str, default None
+            If given, then the probability vectors are stored in memory
+            inside a file of the same name.
 
         Output
         ------
@@ -346,7 +350,8 @@ class CustomClassifier:
         if plot_results:
             plt.show()
 
-        np.save('prob_vectors', prob_vectors)
+        if save_name is not None:
+            np.save(save_name, prob_vectors)
         return prob_vectors
 
     def create_base_collection(self, num_images_per_class=10):
@@ -437,19 +442,44 @@ if __name__ == '__main__':
 
     cc = CustomClassifier(api_key, version)
 
-    collection_paths = np.load('collection_paths.npy')
-    collection_prob_vectors = np.load('collection_prob_vectors.npy')
-    test_prob_vectors = np.load('test_prob_vectors.npy')
+#    collection_paths = np.load('collection_paths.npy')
+#    collection_prob_vectors = np.load('collection_prob_vectors.npy')
+#    test_prob_vectors = np.load('test_prob_vectors.npy')
+#
+#    prob_vectors_multi = np.load('prob_vectors_multi.npy')
 
+    # Classify single-labeled test images
     cc.set_train_folder('datasets/ImageNet')
     cc.set_test_folder('datasets/test_set')
-    test_images_paths = cc.load_test_images()
 
-    cc.visualize_results(collection_prob_vectors,
-                         collection_paths)
+    test_images_paths = cc.load_test_images()
+    test_prob_vectors = cc.classify(test_images_paths)
+
+    cc.visualize_results(test_prob_vectors, test_images_paths)
+
+    # Create a base collection
+    collection_paths = cc.create_base_collection(num_images_per_class=5)
+    collection_prob_vectors = cc.classify(collection_paths)
+
+    cc.visualize_results(collection_prob_vectors, collection_paths)
 
     cc.visualize_results(collection_prob_vectors,
                          collection_paths,
-                         test_set_prob=test_prob_vectors[1:2],
-                         test_set_paths=test_images_paths[1:2],
-                         perplexity=7)
+                         test_set_prob=test_prob_vectors[:1],
+                         test_set_paths=test_images_paths[:1],
+                         perplexity=12, image_size=52)
+
+    # Classify multi-labeled test images
+    cc.set_test_folder('datasets/multi_test_set')
+
+    test_images_paths_multi = cc.load_test_images()
+    test_prob_vectors_multi = cc.classify(test_images_paths_multi)
+
+    cc.visualize_results(test_prob_vectors_multi, test_images_paths_multi,
+                         perplexity=11, image_size=52)
+
+    cc.visualize_results(collection_prob_vectors,
+                         collection_paths,
+                         test_set_prob=test_prob_vectors_multi[:1],
+                         test_set_paths=test_images_paths_multi[:1],
+                         perplexity=12, image_size=52)
