@@ -9,6 +9,7 @@
 #
 #   datasets/
 #       ImageNet/
+#       test_set/
 
 import os
 
@@ -32,11 +33,15 @@ with open(os.path.join(imagenet_folder, 'selected_classes.txt'), 'a') as f:
 # Uncompress the data into the respective folders
 utils.uncompress_folders(imagenet_folder, imagenet_folder)
 
-# Select 100 random images from each class,
-# and then store them in new folders.
+# Select a few random images from each class,
+# and then store them in new folders for the training set.
+# Do the same for the test set.
 number_of_images = 100
+number_of_test_images = 10
 utils.select_random_images(selected_classes, imagenet_folder, imagenet_folder,
-                           number_of_images)
+                           number_of_images,
+                           test_folder=os.path.join(os.getcwd(), 'datasets', 'test_set'),
+                           number_of_test_images=number_of_test_images)
 
 # Compress each class folder into a separate .zip file for the classifier
 utils.compress_folders(imagenet_folder, selected_classes)
