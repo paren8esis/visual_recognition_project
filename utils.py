@@ -76,11 +76,15 @@ def uncompress_folders(data_folder, dest_folder):
                        extract_dir=os.path.join(dest_folder, file_label + '_all'))
 
 
-def select_random_images(selected_classes, data_folder, dest_folder,
-                         number_of_images):
+def select_random_images(selected_classes, data_folder, train_folder,
+                         number_of_images, test_folder=None,
+                         number_of_test_images=10):
     '''
     Randomly selects a number of images from each class in
-    'selected_classes' and copies them in separate folders.
+    'selected_classes' and copies them in separate folders in order to form
+    a training set. If test_folder is specified, then this function also
+    selects another subset of images (disjoint from those selected for
+    training) and stores them all inside the test_folder.
 
     Parameters
     ----------
@@ -88,12 +92,18 @@ def select_random_images(selected_classes, data_folder, dest_folder,
         The labels of the selected classes.
     data_folder: str
         The dataset folder.
+    train_folder: str
+        The base folder for the training set to be created.
     number_of_images: int
         The number of images to select from each class.
+    test_folder: int, default None
+        The folder inside which to store the test set.
+    number_of_test_images: int, default 10
+        The number of test images to be selected from each class.
     '''
     for cl in selected_classes:
         try:
-            os.mkdir(os.path.join(dest_folder, cl))
+            os.mkdir(os.path.join(train_folder, cl))
         except:
             pass
         imagenames = os.listdir(os.path.join(data_folder, cl + '_all'))
@@ -101,7 +111,13 @@ def select_random_images(selected_classes, data_folder, dest_folder,
                          number_of_images)
         for ind in indices:
             copy2(os.path.join(data_folder, cl+'_all', imagenames[ind]),
-                  os.path.join(dest_folder, cl, imagenames[ind]))
+                  os.path.join(train_folder, cl, imagenames[ind]))
+
+        if test_folder is not None:
+            indices_test = sample(set(range(len(imagenames))) - set(indices))
+            for ind in indices_test:
+                copy2(os.path.join(data_folder, cl+'_all', imagenames[ind]),
+                      os.path.join(test_folder, imagenames[ind]))
 
 
 def download_save_image(url, test_folder):
