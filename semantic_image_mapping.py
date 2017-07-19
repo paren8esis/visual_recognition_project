@@ -442,18 +442,17 @@ if __name__ == '__main__':
 
     cc = CustomClassifier(api_key, version)
 
-#    collection_paths = np.load('collection_paths.npy')
-#    collection_prob_vectors = np.load('collection_prob_vectors.npy')
-#    test_prob_vectors = np.load('test_prob_vectors.npy')
-#
-#    prob_vectors_multi = np.load('prob_vectors_multi.npy')
+    cc.get_classifier_details()
 
     # Classify single-labeled test images
     cc.set_train_folder('datasets/ImageNet')
     cc.set_test_folder('datasets/test_set')
 
     test_images_paths = cc.load_test_images()
+
     test_prob_vectors = cc.classify(test_images_paths)
+#    test_prob_vectors = np.load('test_prob_vectors.npy')
+
 
     cc.visualize_results(test_prob_vectors, test_images_paths)
 
@@ -469,11 +468,16 @@ if __name__ == '__main__':
                          test_set_paths=test_images_paths[:1],
                          perplexity=12, image_size=52)
 
+#    collection_paths = np.load('collection_paths.npy')
+#    collection_prob_vectors = np.load('collection_prob_vectors.npy')
+
     # Classify multi-labeled test images
     cc.set_test_folder('datasets/multi_test_set')
 
     test_images_paths_multi = cc.load_test_images()
+
     test_prob_vectors_multi = cc.classify(test_images_paths_multi)
+#    prob_vectors_multi = np.load('prob_vectors_multi.npy')
 
     cc.visualize_results(test_prob_vectors_multi, test_images_paths_multi,
                          perplexity=11, image_size=52)
