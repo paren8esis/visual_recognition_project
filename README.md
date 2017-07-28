@@ -1,5 +1,6 @@
 # README #
 
+# Approach 1 #
 ### Idea ###
 
 1. Train Watson Visual Classifier with the [ImageNet dataset](http://www.image-net.org/).
@@ -10,3 +11,5 @@
 ### Notes ###
 
 First run the data preparation script (*imagenet_data_preparation.py*) to prepare the datasets. Then use the file *semantic_image_mapping.py* to do the classification and visualization of the results. The file *utils.py* contains a few useful routines used by all other scripts.
+
+# Approach 2 #
